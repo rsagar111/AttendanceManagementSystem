@@ -1,0 +1,118 @@
+﻿@model AttendanceManagementSystem.Models.Attendance
+@{
+    ViewBag.Title = "Attendance";
+    Layout = "~/Views/Shared/StaffDashboardLayout.cshtml";
+
+}
+
+<script>
+    $(document).ready(function () {
+        waitcomplete();
+        $('#tbl_Staff').dataTable();
+    })
+</script>
+<style>
+    table thead tr th {
+        text-align: center;
+    }
+</style>
+<div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+    <div class="card-header"><center><h2>Add Attendance</h2></center></div>
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-3"><label style="font-size:large"> Selected  Standard : </label></div>
+        <div class="col-sm-2">
+            <label style="font-size:large;font-weight:bold"> @Model.StandardName</label>
+
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-2"><label style="font-size:large">Select Division : </label></div>
+        <div class="col-sm-3">
+            @Html.DropDownListFor(model => model.DivisionId, (IEnumerable<SelectListItem>)ViewBag.DivisionDrop, new { @class = "form-control", @id = "ddlDivisionId"@*, @onchange = "OnchangeDivisionSeat(this)"*@ })
+            @Html.HiddenFor(model => Model.DivisionId);
+        </div>
+        
+        <div class="col-sm-1">
+            <input type="button" class="btn btn-primary" value="Search"/>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="tbl_staff">
+            <thead>
+                <tr>
+                    <th>S.N.</th>
+                    <th>Photo</th>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    <th>Attendance</th>
+                    <th>Attendance Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            @*<tbody>
+                @if (Model.lstPersonDetails != null && Model.lstPersonDetails.Count > 0)
+                {
+                    int a = 1;
+                    foreach (var item in Model.lstPersonDetails)
+                    {
+                        <tr>
+
+                            <td>@a</td>
+                            <td>
+                                <img src="~/UploadedFiles/Staff/@item.FileName" class="img-circle" style="width:80px;height:80px;border-radius:50%;" />
+                            </td>
+                            <td>@item.RollNo</td>
+                            <th>
+                                @item.PersonName
+                                @Html.HiddenFor(Model => item.PersonId)
+                            </th>
+                            <th>@item.FatherName</th>
+
+                            <td>@item.Emailid</td>
+                            <td>@item.MobileNo</td>
+                            <td>@item.City</td>
+                            <td>@item.Gender</td>
+                            <td>@item.Address</td>
+                            <td>@item.Pincode</td>
+                            <td>@item.DivisionId</td>
+                        </tr>
+                        a++;
+                    }
+                }
+            </tbody>*@
+
+            <tbody id="stdbody">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function OnchangeDivisionSeat(obj) {
+        debugger
+        var divid = parseInt($(obj).val());
+        if (divid > 0) {
+            $.post("/StaffDashboard/GetAttendanceStudentAccToDivision", {  b: divid }, function (res) {
+                debugger
+                if (res != "") {
+                    var data = res.split("|");
+                    $("#TSeat").text(data[1]);
+                    $("#TAdmitted").text('');
+                    $("#TAdmitted").text(data[2]);
+
+                    $("#SRemaining").text(data[3]);
+                    $("#txtStRollno").val(data[4]);
+
+                }
+                else {
+                    alert("No Seat Available...")
+                }
+            })
+        }
+    }
+</script>

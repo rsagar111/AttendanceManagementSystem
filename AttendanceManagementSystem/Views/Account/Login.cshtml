@@ -1,0 +1,284 @@
+﻿@model AttendanceManagementSystem.Models.User
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutHeader.cshtml";
+}
+
+<link href="~/Content/ExCss/LoginCss.css" rel="stylesheet" />
+<link href="~/Content/ExCss/sweetalert.css" rel="stylesheet" />
+<script src="~/Content/ExJS/sweetalert.min.js"></script>
+<script>
+    $(document).ready(function () {
+        waitcomplete();
+    })
+</script>
+<div class="container">
+
+    <!-- Outer Row -->
+    <div class="row justify-content-center">
+
+        <div class="col-xl-10 col-lg-12 col-md-9">
+
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <!-- Nested Row within Card Body  bg-login-image -->
+                    <div class="row" id="DivLogin">
+                        <div class="col-lg-6 d-none d-lg-block ">
+                            <img src="~/assets/img/loginuser.jpg" style="padding:20%;position:relative" />
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Login Here!</h1>
+                                </div>
+
+                                @using (Html.BeginForm())
+                                {
+                                    <div class="form-group">
+
+                                        @Html.TextBoxFor(model => model.Username, new { @class = "form-control formbox", @id = "txt_Username", @placeholder = "Enter Username....." })
+                                        @Html.HiddenFor(model => model.UserId, new { @id = "hdn_UserId" })
+
+                                    </div>
+                                    <div class="form-group">
+
+                                        @Html.PasswordFor(model => model.Password, new { @class = "form-control formbox", @id = "txt_Password", @placeholder = "Enter Password....." })
+
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox small">
+                                            <input type="checkbox" class="custom-control-input" id="customCheck">
+                                            <label class="custom-control-label" for="customCheck">
+                                                Remember
+                                                Me
+                                            </label>
+                                        </div>
+                                    </div>
+                                  
+                                    <input type="button" id="lgnBtn" class="btn btn-primary btn-user btn-block" onclick="ValidateUserandPassword()" value="Login" />
+
+                                    <script>
+                                        function ValidateUserandPassword() {
+                                            debugger;
+                                            if ($('#txt_Username').val() == "" || $('#txt_Username').val() == undefined) {
+                                                alert("Please enter username....");
+                                                $('#txt_Username').focus();
+                                                return false;
+                                            }
+                                            if ($('#txt_Password').val() == "" || $('#txt_Password').val() == undefined) {
+                                                alert("Please enter password....");
+                                                $('#txt_Password').focus();
+                                                return false;
+                                            }
+                                            else {
+                                                GetLoading();
+                                                var objlogin = new Object();
+                                                objlogin.Username = $('#txt_Username').val();
+                                                objlogin.Password = $('#txt_Password').val();
+                                                var userdata = JSON.stringify(objlogin);
+
+                                                $.post("/account/checkusernameandpassword", { userlog: userdata }, function (result) {
+                                                    debugger
+                                                   
+                                                    var rolename = result.split("|")[3];
+                                                    var roletype = result.split("|")[4];
+                                                    $('#hdn_UserId').val(result.split("|")[0]);
+                                                    if (result == "") {
+                                                        //alert("invalid username or password....")
+                                                        //swal("Here's a message!", "It's pretty, isn't it?")
+                                                        swal("Invalid username or password...", "please enter valid username and  password!");
+                                                    }
+                                                    else {
+                                                        if (rolename == "Administrator" && roletype == "2") {
+                                                            window.location.href = "/AdminDashboard/AdminDashboardCard";
+                                                        }
+                                                        if (rolename == "Teacher (Staff)" && roletype == "4") {
+                                                            window.location.href = "/StaffDashboard/StaffDashboardCard";
+                                                        }
+                                                        if (rolename == "Student" && roletype == "6") {
+                                                            window.location.href = "/StudentDashboard/StudentDashboardCard";
+                                                                                                               }
+                                                        //else if (rolename == "Administrator" && roletype == "2") {
+                                                        //    window.location.href = "AdminDashboard/AdminDashboardCard";
+                                                        //}
+                                                    }
+                                                    waitcomplete();
+                                                })
+                                                //// $('#lgnBtn').attr('type', 'submit');
+                                                
+                                            }
+                                        }
+
+                                    </script>
+                                }
+
+                                <hr>
+                                <div class="text-center">
+                                    <a class="small" href="#" onclick="UserForgotPassword()">Forgot Password?</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!---Forgot Password-->
+                    <div class="row" style="display:none" id="DivfPassword">
+                        <div class="col-lg-6 d-none d-lg-block">
+                            <img src="~/assets/img/forgotPass.png" style="padding:20%;position:relative" />
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-2">Forgot Your Password?</h1>
+                                    <p class="mb-4">
+                                        We get it, stuff happens. Just enter your email address below
+                                        and we'll send you a link to reset your password!
+                                    </p>
+                                </div>
+                                <form class="user">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(model => model.Uname, new { @class = "form-control formbox", @id = "txt_ForgetUname", @placeholder = "Enter Username....." })
+
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.PasswordFor(model => model.OldPassword, new { @class = "form-control formbox", @id = "txt_OldPassword", @placeholder = "Enter Old Password.....", @onblur = "CheckUserExit(this)" })
+
+                                    </div>
+                                    <div class="form-group DivnewPass" style="display:none">
+                                        @Html.PasswordFor(model => model.NewPassword, new { @class = "form-control formbox", @id = "txt_NewPassword", @placeholder = "Enter New Password....." })
+
+                                    </div>
+                                    <div class="form-group DivnewPass" style="display:none">
+                                        @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control formbox", @id = "txt_ConfirmPassword", @placeholder = "Enter Confirm Password.....", @onchange = "CheckConfirmPassword()" })
+
+                                    </div>
+                                    @*<a href="#" id="sbmtForget" class="btn btn-primary btn-user btn-block">
+                                            Reset Password
+                                        </a>*@
+                                    <input type="button" id="sbmtForget" class="btn btn-primary btn-user btn-block" onclick="ValidationForForgotPassword()" value="Reset Password" />
+
+                                </form>
+                                <hr>
+                                @*<div class="text-center">
+                                        <a class="small" href="register.html">Create an Account!</a>
+                                    </div>*@
+                                <div class="text-center">
+                                    <a class="small" href="/Account/Login">Already have an account? Login!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+   
+</div>
+<style>
+    .formbox {
+        font-size: .8rem;
+        border-radius: 10rem;
+        padding: 1.5rem 1rem;
+    }
+
+    .btn-user {
+        font-size: .8rem;
+        border-radius: 10rem;
+        padding: .75rem 1rem;
+    }
+</style>
+
+<script>
+    function CheckConfirmPassword() {
+        debugger
+
+        if ($('#txt_ConfirmPassword').val() != $('#txt_NewPassword').val()) {
+            swal("Confirm Password Does Not Match....");
+            $('#txt_ConfirmPassword').val('');
+            $('#txt_ConfirmPassword').focus();
+        }
+
+    }
+
+    function ValidationForForgotPassword() {
+        debugger;
+        if ($('#txt_ForgetUname').val() == "" || $('#txt_ForgetUname').val() == undefined) {
+            alert("Please Enter Username....");
+            $('#txt_ForgetUname').focus();
+            return false;
+        }
+        if ($('#txt_OldPassword').val() == "" || $('#txt_OldPassword').val() == undefined) {
+            alert("Please Enter Old Password....");
+            $('#txt_OldPassword').focus();
+            return false;
+        }
+        if ($('#txt_NewPassword').val() == "" || $('#txt_NewPassword').val() == undefined) {
+            alert("Please Enter New Password....");
+            $('#txt_NewPassword').focus();
+            return false;
+        }
+        if ($('#txt_ConfirmPassword').val() == "" || $('#txt_ConfirmPassword').val() == undefined) {
+            alert("Please Enter Confirm Password....");
+            $('#txt_ConfirmPassword').focus();
+            return false;
+        }
+        if (CheckConfirmPassword()) {
+            return false;
+        }
+        else {
+            var forgotPass = new Object();
+            forgotPass.Uname = $('#txt_ForgetUname').val();
+            forgotPass.OldPassword = $('#txt_OldPassword').val();
+            forgotPass.NewPassword = $('#txt_NewPassword').val();
+            forgotPass.UserId = $('#hdn_UserId').val();
+
+            var userdata = JSON.stringify(forgotPass);
+
+            $.post("/Account/ChangeUserPassword", { changePass: userdata }, function (result) {
+                debugger
+                if (result == "True") {
+                    swal("Good!", "Your Password has been changed successfully!", "success")
+                    window.location.href = "/Account/Login";
+                }
+                else {
+                    swal("Some Error Occured!");
+                }
+            })
+            //// $('#lgnBtn').attr('type', 'submit');
+        }
+    }
+
+    function CheckUserExit(Obj) {
+        debugger
+        var psw = $(Obj).val();
+        var userId = $('#hdn_UserId').val();
+        var fusername = $('#txt_ForgetUname').val();
+        if (psw != null && psw != "") {
+            $.post("/Account/CheckUserExit", { oldpass: psw, fusername: fusername }, function (res) {
+                debugger;
+                if (res.split("|")[0] == "True") {
+                    $('.DivnewPass').show();
+                    $('#hdn_UserId').val(res.split("|")[1])
+                }
+                else {
+                    swal("Password is wrong!...", "Please enter right password..");
+                    $('.DivnewPass').hide();
+                    $('#txt_OldPassword').val('')
+                    $('#txt_OldPassword').focus();
+                }
+            })
+        }
+    }
+
+
+    function UserForgotPassword() {
+        $('#DivLogin').hide();
+        $('#DivfPassword').show();
+    }
+</script>
+
+

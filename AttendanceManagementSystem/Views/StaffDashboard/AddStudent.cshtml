@@ -1,0 +1,315 @@
+﻿@model AttendanceManagementSystem.Models.PersonDetails
+@{
+    ViewBag.Title = "AddStudent";
+    Layout = "~/Views/Shared/StaffDashboardLayout.cshtml";
+}
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        //alert("hii");
+        if ('@Model.IsReturning' == "True") {
+            alert("Record Save Successfully.....");
+            window.location.href = "/StaffDashboard/AddStudent";
+        }
+        else  if ('@Model.IsReturning' == "False") {
+            alert("Some Error Occured...")
+        }
+
+        $("#UserStudent").val('');
+        $("#PasswordStudent").val('');
+
+    });
+</script>
+<div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+    <div class="card-header"><center><h2>Add Student</h2></center></div>
+
+    <div class="card-body">
+        @using (Html.BeginForm("AddStudent", "StaffDashboard", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-3"><label style="font-size:large"> Select  Standard : -</label></div>
+                <div class="col-sm-2">
+                    <label style="font-size:large;font-weight:bold"> @Model.Standard</label>
+
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Select Division : - </label></div>
+                <div class="col-sm-3">
+                    @Html.DropDownListFor(model => model.DivisionId, (IEnumerable<SelectListItem>)ViewBag.DivisionDrop, new { @class = "form-control", @id = "ddlDivisionId", @onchange = "OnchangeDivisionSeat(this)" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-3"><label style="font-weight:bold"> Total Seat = <span id="TSeat">0</span></label></div>
+                <div class="col-sm-3">
+                    <label style="font-weight:bold">Total Admitted = <span id="TAdmitted">0</span></label>
+
+                </div>
+                <div class="col-sm-3">
+                    <label style="font-weight:bold">Student Remaining = <span id="SRemaining">0</span></label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large"> Roll No</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.RollNo, new { @class = "form-control", @placeholder = "Enter Roll No.....", id = "txtStRollno",@readonly=true })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Student Name</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.PersonName, new { @class = "form-control", @placeholder = "Enter Name.....", })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+
+                <div class="col-sm-2"><label style="font-size:large">Father Name</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.FatherName, new { @class = "form-control", @placeholder = "Enter Father Name.." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Email</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Emailid, new { @class = "form-control", @placeholder = "Enter Email.....", @type = "email" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Mobile No</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.MobileNo, new { @class = "form-control", @maxlength = "10", @placeholder = "Enter Mobile No....." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">DOB</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.DOB, new { @class = "form-control", @id = "txtDOB", @type = "date" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Address</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextAreaFor(model => model.Address, new { @class = "form-control", @placeholder = "Enter Address.....", @style = "resize:none" })
+                </div>
+            
+                    <div class="col-sm-2"><label style="font-size:large">City</label> <r style="color:red">*</r> </div>
+                    <div class="col-sm-3">
+                        @Html.TextBoxFor(model => model.City, new { @class = "form-control", @placeholder = "Enter City....." })
+                    </div>
+                    <div class="col-sm-1"></div>
+                
+            </div>
+            <br />
+
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Gender</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.DropDownListFor(model => model.Gender, new List<SelectListItem>{
+                   new SelectListItem{ Text = "--Select--" ,Value="0"}
+                   ,new SelectListItem{ Text = "Male",Value="1" }
+                   ,new SelectListItem{ Text = "Female",Value="2" }
+                   }, new { @class = "form-control", @id = "ddl_Gender" })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Pincode</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Pincode, new { @class = "form-control", @placeholder = "Enter Pincode.....", @maxlength = "6" })
+                </div>
+
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Photo</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.file, new { @type = "file", @id = "fileselector", @accept = ".jpg, .jpeg, .png" })
+
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Username</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.UserStudent, new { @class = "form-control", @placeholder = "Enter Username....." })
+                </div>
+
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+
+                <div class="col-sm-2"><label style="font-size:large">Password</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.PasswordFor(model => model.PasswordStudent, new { @class = "form-control", @placeholder = "Enter Password....." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Confirm Password</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.PasswordFor(model => model.CnfrmPassword, new { @class = "form-control", @placeholder = "Enter Confirm Password.....", @onchange = "CheckConfirmPassword()" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 text-center">
+                    @*<input type="button" class="btn btn-info" value="Update" style="width:50%;display:none" onclick="ValidationStandard('ForUpdate')" id="updatebtn" />*@
+
+                    <input type="button" class="btn btn-success" value="Add Student" style="width:50%" onclick="StudentValidation()" id="addbtn" />
+                </div>
+                <div class="col-sm-4"></div>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+
+<script>
+
+    function OnchangeDivisionSeat(obj) {
+        debugger
+        var divid = parseInt($(obj).val());
+        if (divid > 0) {
+            $.post("/StaffDashboard/GetSeatDetailsAccToDivsion", { divid: divid }, function (res) {
+                debugger
+                if (res != "") {
+                    var data = res.split("|");
+                    $("#TSeat").text(data[1]);
+                    $("#TAdmitted").text('');
+                    $("#TAdmitted").text(data[2]);
+
+                    $("#SRemaining").text(data[3]);
+                    $("#txtStRollno").val(data[4]);
+                   
+                }
+                else {
+                    alert("No Seat Available...")
+                }
+            })
+        }
+    }
+
+    function CheckConfirmPassword() {
+        debugger
+
+        if ($('#CnfrmPassword').val() != $('#PasswordStudent').val()) {
+            swal("Confirm Password Does Not Match....");
+            $('#CnfrmPassword').val('');
+            $('#CnfrmPassword').focus();
+        }
+
+    }
+
+    function StudentValidation() {
+        debugger
+        //if ($('#txtStRollno').val() == "" || $('#txtStRollno').val() == undefined) {
+        //    alert("Please enter Roll No...");
+        //    $('#txtStRollno').focus();
+        //    return false;
+        //}
+
+        if ($('#PersonName').val() == "" || $('#PersonName').val() == undefined) {
+            alert("Please enter person name...");
+            $('#PersonName').focus();
+            return false;
+        }
+        if ($('#FatherName').val() == "" || $('#FatherName').val() == undefined) {
+            alert("Please enter father name...");
+            $('#FatherName').focus();
+            return false;
+        }
+        if ($('#Emailid').val() == "" || $('#Emailid').val() == undefined) {
+            alert("Please enter emailid... ");
+            $('#Emailid').focus();
+            return false;
+        }
+        if ($('#MobileNo').val() == "" || $('#MobileNo').val() == undefined) {
+            alert("Please enter mobile number...");
+            $('#MobileNo').focus();
+            return false;
+        }
+        //if ($('#Qualification').val() == "" || $('#Qualification').val() == undefined) {
+        //    alert("Please enter qualification...");
+        //    $('#Qualification').focus();
+        //    return false;
+        //}
+        if ($('#Address').val() == "" || $('#Address').val() == undefined) {
+            alert("Please enter address... ");
+            $('#Address').focus();
+            return false;
+        }
+        if ($('#City').val() == "" || $('#City').val() == undefined) {
+            alert("Please select city...");
+            $('#City').focus();
+            return false;
+        }
+        if ($('#Pincode').val() == "" || $('#Pincode').val() == undefined) {
+            alert("Please enter pincode...");
+            $('#Pincode').focus();
+            return false;
+        }
+
+        if ($('#ddl_Gender').val() == "0" || $('#ddl_Gender').val() == "-1") {
+            alert("Please select gender...");
+            $('#ddl_Gender').focus();
+            return false;
+        }
+        if ($('#fileselector').val() == "" || $('#fileselector').val() == undefined) {
+            alert("Please select photo...");
+            $('#fileselector').focus();
+            return false;
+        }
+
+        //if ($('#ddl_Standard').val() == "0" || $('#ddl_Standard').val() == "-1") {
+        //    alert("Please select standard...");
+        //    $('#ddl_Standard').focus();
+        //    return false;
+        //}
+
+        if ($('#UserStudent').val() == "" || $('#UserStudent').val() == undefined) {
+            alert("Please enter username....");
+            $('#UserStudent').focus();
+            return false;
+        }
+        if ($('#PasswordStudent').val() == "" || $('#PasswordStudent').val() == undefined) {
+            alert("Please enter password....");
+            $('#PasswordStudent').focus();
+            return false;
+        }
+        if ($('#CnfrmPassword').val() == "" || $('#CnfrmPassword').val() == undefined) {
+            alert("Please enter confirm password....");
+            $('#CnfrmPassword').focus();
+            return false;
+        }
+        if (CheckConfirmPassword()) {
+            return false;
+        }
+        else {
+            GetLoading();
+            $('#addbtn').attr('type', 'submit');
+        }
+    }
+</script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

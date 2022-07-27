@@ -1,0 +1,180 @@
+﻿@model AttendanceManagementSystem.Models.AdminCommonClass
+@{
+    ViewBag.Title = "AddStandard";
+    Layout = "~/Views/Shared/AdminDashboardLayout.cshtml";
+}
+
+        <div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+            <div class="card-header"><center><h2>Add Standard</h2></center></div>
+
+            <div class="card-body">
+                @using (Html.BeginForm())
+                {
+
+                    <div class="row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-3"><label style="font-size:large">Standard Name</label> <r style="color:red">*</r> </div>
+                        <div class="col-sm-3">
+                            @Html.TextBoxFor(model => model.StandardName, new { @class = "form-control" })
+                            @Html.HiddenFor(model=>model.StandardId,new { @id="hdn_SID"})
+                        </div>
+                        <div class="col-sm-2"></div>
+                    </div>
+                    <br />
+                    <div class="row">   
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4 text-center">
+                            <input type="button" class="btn btn-info" value="Update" style="width:50%;display:none" onclick="ValidationStandard('ForUpdate')" id="updatebtn"/>
+
+                            <input type="button" class="btn btn-success" value="Add" style="width:50%" onclick="ValidationStandard('ForInsert')" id="addbtn"/>
+                        </div>
+                        <div class="col-sm-4"></div>
+
+                    </div>
+                }
+                <br />
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <table class="table table-bordered table-hover" id="TblStand">
+                        <thead>
+                            <tr>
+                                <th colspan="2" style="text-align:center;">Action</th>
+                                <th colspan="2"style="text-align:center;">Standard Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appendBody">
+                           
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-sm-3"></div>
+            </div>
+                </div>
+        </div>
+<script>
+    function ValidationStandard(mode) {
+        debugger
+       
+        if ($('#StandardName').val() == "" || $('#StandardName').val() == undefined) {
+            swal("Please enter standard name");
+            $('#StandardName').focus();
+            return false;
+        }
+        else {
+            var obj = new Object();
+            obj.StandardName = $('#StandardName').val();
+            obj.StandardId = $('#hdn_SID').val();
+            if (mode =="ForInsert") {
+                $.post("/AdminDashboard/SaveStandardName", { standard: JSON.stringify(obj) }, function (response) {
+                    debugger
+                    if (response == "True") {
+                        swal("Good!", "standard name save successfully!", "success")
+                        $('#StandardName').val('');
+                        $('#StandardName').focus();
+                    }
+                    else {
+                        swal("some error occured...")
+                    }
+                });
+            }
+            else if (mode == "ForUpdate") {
+                $.post("/AdminDashboard/UpdateStandardName", { updateSID: JSON.stringify(obj) }, function (response) {
+                    debugger
+                    if (response == "True") {
+                        swal("Good!", "standard name update successfully!", "success")
+                        $('#StandardName').val('');
+                        $('#StandardName').focus();
+                    }
+                    else {
+                        swal("some error occured...")
+                    }
+                });
+                $('#updatebtn').hide();
+                $('#addbtn').show();
+            }
+           
+            var StandardId = "";
+            var StandardName = "";
+            var myhtml = "";
+            $.post("/AdminDashboard/GetStandardNameData", function (res) {
+                debugger
+                myhtml = "";
+                $('#TblStand tbody tr').remove()
+                if (res != "") {
+                    if (res.length>0) {
+                        for (var i = 0; i <res.length; i++) {
+                            StandardId = res[i].StandardId;
+                            StandardName = res[i].StandardName;
+                            myhtml = "<tr id='row_" + i + "'><td><a href='#' onclick='EditStandardName(this)'>Edit</a></td><td><a href='#' onclick='DeleteStandardName(this);'>Delete</a></td><td style='display:none'>" + StandardId + "</td><td>" + StandardName + "</td></tr>";
+                            $('#appendBody').append(myhtml);
+                            myhtml = "";
+                        }
+                    }
+                   
+                }
+               
+            });
+        }
+    }
+
+    function EditStandardName(obj) {
+        debugger
+        // alert(stdid + " " + stname);
+        //var editext = $(obj).parent().parent()[0].id;
+        var stdid = $(obj).parent().parent()[0].childNodes[2].innerText;
+        var stname = $(obj).parent().parent()[0].childNodes[3].innerText;
+
+        //alert(stdid + " " + stname);
+        if (stdid!=""&&stname!="") {
+            $('#StandardName').val(stname);
+            $('#hdn_SID').val(stdid);
+            $('#addbtn').hide();
+            $('#updatebtn').show();
+        }
+    }
+
+    function DeleteStandardName(obj) {
+        debugger
+        var stdid = $(obj).parent().parent()[0].childNodes[2].innerText;
+        var stname = $(obj).parent().parent()[0].childNodes[3].innerText;
+        if (stdid != "" && stname != "") {
+            $('#StandardName').val(stname);
+            $('#hdn_SID').val(stdid);
+           
+            $.post("/AdminDashboard/DeleteStandardName", { stdid: stdid }, function (response) {
+                debugger
+                if (response == "True") {
+                    swal("Good!", "standard name delete successfully!", "success")
+                    $('#StandardName').val('');
+                    $('#StandardName').focus();
+                }
+                else {
+                    swal("some error occured...")
+                }
+            });
+            var myhtml = "";
+            $.post("/AdminDashboard/GetStandardNameData", function (res) {
+                debugger
+                myhtml = "";
+                $('#TblStand tbody tr').remove()
+                if (res != "") {
+                    if (res.length>0) {
+                        for (var i = 0; i <res.length; i++) {
+                            StandardId = res[i].StandardId;
+                            StandardName = res[i].StandardName;
+                            myhtml = "<tr><td><a href='#' onclick='EditStandardName(this)'>Edit</a></td><td><a href='#' onclick='DeleteStandardName(this)'>Delete</a></td><td style='display:none'>" + StandardId + "</td><td>" + StandardName + "</td></tr>";
+                            $('#appendBody').append(myhtml);
+                            myhtml = "";
+                        }
+                    }
+                   
+                }
+               
+            });
+        }
+    }
+</script>
+
+

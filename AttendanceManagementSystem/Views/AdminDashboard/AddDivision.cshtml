@@ -1,0 +1,237 @@
+﻿@model AttendanceManagementSystem.Models.AdminCommonClass
+@{
+    ViewBag.Title = "AddDivision";
+    Layout = "~/Views/Shared/AdminDashboardLayout.cshtml";
+}
+
+<div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+    <div class="card-header"><center><h2>Add Division</h2></center></div>
+
+    <div class="card-body">
+        @using (Html.BeginForm())
+        {
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3"><label style="font-size:large">Division Name</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.DivisionName, new { @class = "form-control" })
+                    @Html.HiddenFor(model => model.DivisionId, new { @id = "hdn_divId" })
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3"><label style="font-size:large">Seat</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Seat, new { @class = "form-control" })
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-3"><label style="font-size:large">Standanrd</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.DropDownListFor(model => model.StandardId, (IEnumerable<SelectListItem>)ViewBag.StandardDrop, new { @class = "form-control", @id = "ddl_Standard" })
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 text-center">
+                    <input type="button" class="btn btn-info" value="Update" style="width:50%;display:none" onclick="ValidationDivisionDetails('ForUpdate')" id="updatebtn" />
+
+                    <input type="button" class="btn btn-success" value="Add" style="width:50%" onclick="ValidationDivisionDetails('ForInsert')" id="addbtn" />
+                </div>
+                <div class="col-sm-4"></div>
+
+            </div>
+        }
+        <br />
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                <table class="table table-bordered table-hover" id="TblStand">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="text-align:center;">Action</th>
+                            <th style="text-align:center;">Division</th>
+                            <th class="text-center">Seat</th>
+                            <th colspan="3" class="text-center">Standard</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appendBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
+</div>
+<script>
+    function ValidationDivisionDetails(mode) {
+        debugger
+
+        if ($('#DivisionName').val() == "" || $('#DivisionName').val() == undefined) {
+            swal("Please enter division name...");
+            $('#DivisionName').focus();
+            return false;
+        }
+        if ($('#Seat').val() == "" || $('#Seat').val() == undefined) {
+            swal("Please enter seat value... ");
+            $('#Seat').focus();
+            return false;
+        }
+        if ($('#ddl_Standard').val() == "0" || $('#ddl_Standard').val() == "-1") {
+            swal("Please select standard...");
+            $('#ddl_Standard').focus();
+            return false;
+        }
+        else {
+            var obj = new Object();
+            obj.DivisionName = $('#DivisionName').val();
+            obj.DivisionId = $('#hdn_divId').val();
+            obj.Seat = $('#Seat').val();
+            obj.StandardId = $('#ddl_Standard').val();
+
+            if (mode == "ForInsert") {
+                $.post("/AdminDashboard/SaveDivisionNameDetails", { standard: JSON.stringify(obj) }, function (response) {
+                    debugger
+                    if (response == "True") {
+                        swal("Good!", "division details save successfully!", "success")
+                        $('#DivisionName').val('');
+                        $('#Seat').val('');
+                        $('#ddl_Standard').val('0');
+
+                        $('#DivisionName').focus();
+                    }
+                    else {
+                        swal("some error occured...")
+                    }
+                });
+            }
+            else if (mode == "ForUpdate") {
+                $.post("/AdminDashboard/UpdateDivisionName", { updateSID: JSON.stringify(obj) }, function (response) {
+                    debugger
+                    if (response == "True") {
+                        swal("Good!", "Division details update successfully!", "success")
+                        $('#DivisionName').val('');
+                        $('#Seat').val('');
+                        $('#ddl_Standard').val('0');
+
+                        $('#DivisionName').focus();
+                    }
+                    else {
+                        swal("some error occured...")
+                    }
+                });
+               
+                $('#updatebtn').hide();
+                $('#addbtn').show();
+            }
+
+            var DivisionId = "";
+            var DivisionName = "";
+            var StandardId = "";
+            var StandardName = "";
+            var Seat = "";
+
+            var myhtml = "";
+            $.post("/AdminDashboard/GetDivisionData", function (res) {
+                debugger
+                myhtml = "";
+                $('#TblStand tbody tr').remove()
+                if (res != "") {
+                    if (res.length > 0) {
+                        for (var i = 0; i < res.length; i++) {
+                            DivisionId = res[i].DivisionId;
+                            DivisionName = res[i].DivisionName;
+                            Seat = res[i].Seat;
+                            StandardId = res[i].StandardId;
+                            StandardName = res[i].StandardName;
+
+                            myhtml = "<tr id='row_" + i + "'><td><a href='#' onclick='EditDivisionName(this)'>Edit</a></td><td><a href='#' onclick='DeleteDivisionName(this);'>Delete</a></td><td>" + DivisionName + "</td><td>" + Seat + "</td><td>" + StandardName + "</td><td style='display:none'>" + DivisionId + "</td><td style='display:none'>" + StandardId + "</td></tr>";
+                            $('#appendBody').append(myhtml);
+                            myhtml = "";
+                        }
+                    }
+
+                }
+
+                });
+            }
+    }
+
+        function EditDivisionName(obj) {
+            debugger
+
+            var divname = $(obj).parent().parent()[0].childNodes[2].innerText;
+            var seat = $(obj).parent().parent()[0].childNodes[3].innerText;
+            //var stname = $(obj).parent().parent()[0].childNodes[4].innerText;
+            var divid = $(obj).parent().parent()[0].childNodes[5].innerText;
+            var stdid = $(obj).parent().parent()[0].childNodes[6].innerText;
+
+            //alert(stdid + " " + stname);
+            if (divname != "" && seat != "" && divid != "" && stdid != "") {
+                $('#DivisionName').val(divname);
+                $('#hdn_divId').val(divid);
+                $('#Seat').val(seat);
+                $('#ddl_Standard').val(stdid);
+
+                $('#addbtn').hide();
+                $('#updatebtn').show();
+            }
+        }
+
+        function DeleteDivisionName(obj) {
+            debugger
+            var divid = $(obj).parent().parent()[0].childNodes[5].innerText;
+            var stname = $(obj).parent().parent()[0].childNodes[3].innerText;
+            if (divid != "") {
+                $('#hdn_divId').val(divid);
+
+                $.post("/AdminDashboard/DeleteDivisionName", { stdid: divid }, function (response) {
+                    debugger
+                    if (response == "True") {
+                        swal("Good!", " Deleted this record successfully!", "success")
+                    }
+                    else {
+                        swal("some error occured...")
+                    }
+                });
+                var DivisionId = "";
+                var DivisionName = "";
+                var StandardId = "";
+                var StandardName = "";
+                var Seat = "";
+
+                var myhtml = "";
+                $.post("/AdminDashboard/GetDivisionData", function (res) {
+                    debugger
+                    myhtml = "";
+                    $('#TblStand tbody tr').remove()
+                    if (res != "") {
+                        if (res.length > 0) {
+                            for (var i = 0; i < res.length; i++) {
+                                DivisionId = res[i].DivisionId;
+                                DivisionName = res[i].DivisionName;
+                                Seat = res[i].Seat;
+                                StandardId = res[i].StandardId;
+                                StandardName = res[i].StandardName;
+
+                                myhtml = "<tr id='row_" + i + "'><td><a href='#' onclick='EditDivisionName(this)'>Edit</a></td><td><a href='#' onclick='DeleteDivisionName(this);'>Delete</a></td><td>" + DivisionName + "</td><td>" + Seat + "</td><td>" + StandardName + "</td><td style='display:none'>" + DivisionId + "</td><td style='display:none'>" + StandardId + "</td></tr>";
+                                $('#appendBody').append(myhtml);
+                                myhtml = "";
+                            }
+                        }
+
+                    }
+
+                });
+            }
+        }
+</script>

@@ -1,0 +1,232 @@
+﻿@model AttendanceManagementSystem.Models.PersonDetails
+@{
+    ViewBag.Title = "AddStaff";
+    Layout = "~/Views/Shared/AdminDashboardLayout.cshtml";
+}
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        //alert("hii");
+        if ('@ViewBag.message' == "True") {
+            alert("Record Save Successfully.....");
+            window.location.href = "/AdminDashboard/AddStaff";
+          
+        }
+
+    });
+</script>
+<div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+    <div class="card-header"><center><h2>Add Staff Details</h2></center></div>
+
+    <div class="card-body">
+        @using (Html.BeginForm("AddStaff", "AdminDashboard", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Staff Name</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.PersonName, new { @class = "form-control", @placeholder = "Enter Staff Name....." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Email</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Emailid, new { @class = "form-control", @placeholder = "Enter Email.....", @type = "email" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Mobile No</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.MobileNo, new { @class = "form-control", @placeholder = "Enter Mobile No.....",@maxlength="10" })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Qualification</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Qualification, new { @class = "form-control", @placeholder = "Enter Qualification....." })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Address</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextAreaFor(model => model.Address, new { @class = "form-control", @placeholder = "Enter Address....." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">City</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.City, new { @class = "form-control", @placeholder = "Enter City....." })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Pincode</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Pincode, new { @class = "form-control", @placeholder = "Enter Pincode.....", @maxlength = "6" })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Gender</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.DropDownListFor(model => model.Gender, new List<SelectListItem>{
+                   new SelectListItem{ Text = "--Select--" ,Value="0"}
+                   ,new SelectListItem{ Text = "Male",Value="1" }
+                   ,new SelectListItem{ Text = "Female",Value="2" }
+                   }, new { @class = "form-control", @id = "ddl_Gender" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+            <br />
+
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Photo</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.file, new { @type = "file", @id = "fileselector", @accept = ".jpg, .jpeg, .png" })
+
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Standard</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.DropDownListFor(model => model.Standard, (IEnumerable<SelectListItem>)ViewBag.StandardDrop, new { @class = "form-control", @id = "ddl_Standard" })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Username</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.TextBoxFor(model => model.Username, new { @class = "form-control", @placeholder = "Enter Username....." })
+                </div>
+
+                <div class="col-sm-2"><label style="font-size:large">Password</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", @placeholder = "Enter Password....." })
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-2"><label style="font-size:large">Confirm Password</label> <r style="color:red">*</r> </div>
+                <div class="col-sm-3">
+                    @Html.PasswordFor(model => model.CnfrmPassword, new { @class = "form-control", @placeholder = "Enter Confirm Password.....", @onchange = "CheckConfirmPassword()" })
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4 text-center">
+                    @*<input type="button" class="btn btn-info" value="Update" style="width:50%;display:none" onclick="ValidationStandard('ForUpdate')" id="updatebtn" />*@
+
+                    <input type="button" class="btn btn-success" value="Add Staff" style="width:50%" onclick="StaffValidation()" id="addbtn" />
+                </div>
+                <div class="col-sm-4"></div>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<script>
+    function CheckConfirmPassword() {
+        debugger
+
+        if ($('#CnfrmPassword').val() != $('#Password').val()) {
+            swal("Confirm Password Does Not Match....");
+            $('#CnfrmPassword').val('');
+            $('#CnfrmPassword').focus();
+        }
+
+    }
+
+    function StaffValidation() {
+        debugger
+        if ($('#PersonName').val() == "" || $('#PersonName').val() == undefined) {
+            alert("Please enter person name...");
+            $('#PersonName').focus();
+            return false;
+        }
+        if ($('#Emailid').val() == "" || $('#Emailid').val() == undefined) {
+            alert("Please enter emailid... ");
+            $('#Emailid').focus();
+            return false;
+        }
+        if ($('#MobileNo').val() == "" || $('#MobileNo').val() == undefined) {
+            alert("Please enter mobile number...");
+            $('#MobileNo').focus();
+            return false;
+        }
+        if ($('#Qualification').val() == "" || $('#Qualification').val() == undefined) {
+            alert("Please enter qualification...");
+            $('#Qualification').focus();
+            return false;
+        }
+        if ($('#Address').val() == "" || $('#Address').val() == undefined) {
+            alert("Please enter address... ");
+            $('#Address').focus();
+            return false;
+        }
+        if ($('#City').val() == "" || $('#City').val() == undefined) {
+            alert("Please select city...");
+            $('#City').focus();
+            return false;
+        }
+        if ($('#Pincode').val() == "" || $('#Pincode').val() == undefined) {
+            alert("Please enter pincode...");
+            $('#Pincode').focus();
+            return false;
+        }
+
+        if ($('#ddl_Gender').val() == "0" || $('#ddl_Gender').val() == "-1") {
+            alert("Please select gender...");
+            $('#ddl_Gender').focus();
+            return false;
+        }
+        if ($('#fileselector').val() == "" || $('#fileselector').val() == undefined) {
+            alert("Please select photo...");
+            $('#fileselector').focus();
+            return false;
+        }
+
+        if ($('#ddl_Standard').val() == "0" || $('#ddl_Standard').val() == "-1") {
+            alert("Please select standard...");
+            $('#ddl_Standard').focus();
+            return false;
+        }
+
+        if ($('#Username').val() == "" || $('#Username').val() == undefined) {
+            alert("Please enter username....");
+            $('#Username').focus();
+            return false;
+        }
+        if ($('#Password').val() == "" || $('#Password').val() == undefined) {
+            alert("Please enter password....");
+            $('#Password').focus();
+            return false;
+        }
+        if ($('#CnfrmPassword').val() == "" || $('#CnfrmPassword').val() == undefined) {
+            alert("Please enter confirm password....");
+            $('#CnfrmPassword').focus();
+            return false;
+        }
+        if (CheckConfirmPassword()) {
+            return false;
+        }
+        else {
+            $('#addbtn').attr('type', 'submit');
+        }
+    }
+</script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

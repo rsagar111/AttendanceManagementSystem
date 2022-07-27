@@ -1,0 +1,82 @@
+﻿@model AttendanceManagementSystem.Models.PersonDetails
+@{
+    ViewBag.Title = "StaffReport";
+    Layout = "~/Views/Shared/AdminDashboardLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        waitcomplete();
+    })
+</script>
+<style>
+    table thead tr th{
+        text-align:center;
+    }
+</style>
+<div class="card" style="box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 40px rgb(0 0 0 / 10%) inset;">
+    <div class="card-header"><center><h2>Staff Analytics</h2></center></div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="tbl_staff">
+            <thead>
+                <tr>
+                    <th>S.N.</th>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>City</th>
+                    <th>Gender</th>
+                    <th>Standard</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.lstPersonDetails!=null && Model.lstPersonDetails.Count>0)
+                {
+                    int a = 1;
+                    foreach (var item in  Model.lstPersonDetails)
+                    {
+                <tr>
+
+                    <td>@a</td>
+                    <th>
+                        <img src="~/UploadedFiles/Staff/@item.FileName" class="img-circle" style="width:80px;height:80px;border-radius:50%;"/>
+                    </th>
+                    <th>
+                        @item.PersonName
+                        @Html.HiddenFor(Model => item.PersonId)
+                    </th>
+                    <th>@item.Emailid</th>
+                    <th>@item.MobileNo</th>
+                    <th>@item.City</th>
+                    <th>@item.Gender</th>
+                    <th>@item.Standard</th>
+                    <th><a href="#" onclick="DeleteStaffRecord(@item.PersonId)">Delete</a></th>
+
+                </tr>
+                        a++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function DeleteStaffRecord(personid) {
+        //alert(personid);
+        GetLoading();
+        $.post("/AdminDashboard/DeletePersonRecord", { personid: personid }, function (response) {
+            debugger
+            if (response == "True") {
+                swal("Good!", " Deleted this record successfully!", "success")
+                window.location.href = "/AdminDashboard/StaffReport";
+            }
+            else {
+                swal("some error occured...")
+            }
+            waitcomplete();
+        });
+    }
+</script>
